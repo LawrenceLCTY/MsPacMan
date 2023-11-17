@@ -100,7 +100,6 @@ public class MctsNode {
 		*/
 		int livesBefore = clone.getPacmanNumberOfLivesRemaining();
 		int now = clone.getPacmanCurrentNodeIndex();
-		int start = now;
 		while(now != junction){
 
 			int last = now;
@@ -133,6 +132,7 @@ public class MctsNode {
 		case DOWN : down = true; break;
 		case RIGHT : right = true; break;
 		case LEFT : left = true; break;
+		default:break;
 		}
 	}
 
@@ -243,10 +243,7 @@ public class MctsNode {
 			out += "\t";
 		}
 		out += "<node move="+move+" score=" + state.getGame().getScore() + " avg=(" + value + "/" + visited + ")"+value/visited+" visited="+visited + " time=" + time;
-		/*
-		for(Integer i : simulations)
-			out += "(" + i + ")";
-		*/
+		
 		if (children.isEmpty()){
 			out += "/>\n";
 		} else {
