@@ -1,27 +1,15 @@
 package examples.StarterPacMan.MonteCarloPacMan;
 
-import static pacman.game.Constants.DELAY;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
-import pacman.Executor;
 import pacman.controllers.Controller;
-import pacman.controllers.examples.AggressiveGhosts;
 import pacman.controllers.examples.Legacy;
-import pacman.controllers.examples.Legacy2TheReckoning;
-import pacman.controllers.examples.RandomGhosts;
-import pacman.controllers.examples.StarterGhosts;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
@@ -58,7 +46,7 @@ public class MCTS extends Controller<MOVE>{
 		
 		lastLevel = level;
 		
-		return MctsSearch(game, 38);
+		return MctsSearch(game, 50);
 		
 	}
 
@@ -85,11 +73,7 @@ public class MCTS extends Controller<MOVE>{
 		if (bestNode != null)
 			move = bestNode.getMove();
 		
-		/*
-		System.out.println(v0.print(0));
-		System.out.println(move);
-		*/
-		
+
 		return move;
 		
 	}
@@ -134,7 +118,6 @@ public class MCTS extends Controller<MOVE>{
 
 	private boolean dieTest(MctsNode v, MctsNode node) {
 		
-		Controller<MOVE> pacManController = new RandomJunctionPacman();
 		Controller<EnumMap<GHOST,MOVE>> ghostController = ghosts;
     	
 		Game game = v.getState().getGame().copy();
