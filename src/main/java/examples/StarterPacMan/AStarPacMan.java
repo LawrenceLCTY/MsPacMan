@@ -45,7 +45,7 @@ public class AStarPacMan extends PacmanController {
     	int pathLength = pathLengthBase /*+ getRandomInt(-50, 10)*/;
     	
     	// Get possible paths
-    	paths = getPaths(pathLength);
+    	paths = getAStarPaths(pathLength);
     	
     	// Sort the path with highest value DESC
     	Collections.sort(paths, new PathValueComparator());
@@ -240,7 +240,7 @@ public class AStarPacMan extends PacmanController {
         public double heuristicValue;
     }
     
-    public List<Path> getPaths(int maxPathLength)
+    public List<Path> getAStarPaths(int maxPathLength)
     {
     	MOVE[] startingPossibleMoves = game.getPossibleMoves(pacmanCurrentNodeIndex);
     	List<Path> paths = new ArrayList<>();
