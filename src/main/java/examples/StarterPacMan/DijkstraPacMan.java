@@ -26,7 +26,7 @@ import java.util.Set;
  * fill in the getMove() method. Any additional classes you write should either
  * be placed in this package or sub-packages (e.g., entrants.pacman.username).
  */
-public class AStarPacMan extends PacmanController {
+public class DijkstraPacMan extends PacmanController {
 	 private static final Random RANDOM = new Random(); 
 	 private Game game;
 	 private int pacmanCurrentNodeIndex;
@@ -45,7 +45,7 @@ public class AStarPacMan extends PacmanController {
     	int pathLength = pathLengthBase /*+ getRandomInt(-50, 10)*/;
     	
     	// Get possible paths
-    	paths = getAStarPaths(pathLength);
+    	paths = getPathsDijkstra(pathLength);
     	
     	// Sort the path with highest value DESC
     	Collections.sort(paths, new PathValueComparator());
@@ -115,13 +115,6 @@ public class AStarPacMan extends PacmanController {
     	MOVE[] possibleMoves = game.getPossibleMoves(pacmanCurrentNodeIndex, pacmanLastMoveMade);    	
     	
     	return possibleMoves[RANDOM.nextInt(possibleMoves.length)];
-    }
-
-    private double calculateHeuristic(Segment segment, int pacmanNodeIndex, Game game) {
-        
-        double distanceToGoal = game.getEuclideanDistance(segment.end, pacmanNodeIndex);
-        
-        return distanceToGoal;
     }
     
     public class PathValueComparator implements Comparator<Path>
@@ -240,46 +233,32 @@ public class AStarPacMan extends PacmanController {
         public double heuristicValue;
     }
     
-    public List<Path> getAStarPaths(int maxPathLength)
-    {
-    	MOVE[] startingPossibleMoves = game.getPossibleMoves(pacmanCurrentNodeIndex);
-    	List<Path> paths = new ArrayList<>();
-    	int minGhostDistance = minGhostDistanceBase /*+ getRandomInt(10, 30)*/;
+	public List<Path> getPathsDijkstra(int maxPathLength) {
+		MOVE[] startingPossibleMoves = game.getPossibleMoves(pacmanCurrentNodeIndex);
+		List<Path> paths = new ArrayList<>();
+	
+		for (MOVE startingPossibleMove : startingPossibleMoves) {
+			PriorityQueue<Segment> openSet = new PriorityQueue<>(Comparator.comparingDouble(s -> s.lengthSoFar));
+			Set<Integer> closedSet = new HashSet<>();
+			int currentNode = game.getNeighbour(pacmanCurrentNodeIndex, startingPossibleMove);
+	
+			Segment currentSegment = new Segment();
+			currentSegment.start = currentNode;
+			currentSegment.parent = null;
+			currentSegment.direction = startingPossibleMove;
+			currentSegment.lengthSoFar++;
 
-    	// Start searching from the possible moves at the current pacman location
-    	for (MOVE startingPossibleMove : startingPossibleMoves)
-		{   
-    		List<Segment> pendingSegments = new ArrayList<Segment>();
-    		
-			// Step into next node
-    		int currentNode = game.getNeighbour(pacmanCurrentNodeIndex, startingPossibleMove);
-
-    		// Create new segment starting from the node next to pacman
-    		Segment currentSegment = new Segment();
-    		currentSegment.start = currentNode;
-    		currentSegment.parent = null;
-    		currentSegment.direction = startingPossibleMove;
-    		currentSegment.lengthSoFar++;
-    		
-    		// Get all ghosts node index in a list
+			// Get all ghosts node index in a list
     		List<Integer> ghostNodeIndices = new ArrayList<>();
     		GHOST[] ghosts= GHOST.values();
     		for (GHOST ghost: ghosts)
     			ghostNodeIndices.add(game.getGhostCurrentNodeIndex(ghost));
-
-            // A* search
-            PriorityQueue<Segment> openSet = new PriorityQueue<>(
-                Comparator.comparingDouble(s -> s.lengthSoFar + s.heuristicValue));
-            Set<Segment> closedSet = new HashSet<>();
-    		    		
-    		// Loop each step
-    		do
-    		{    			
-        		// Check pills and power pills
-				int pillIndex = game.getPillIndex(currentNode);	
-        		int powerPillIndex = game.getPowerPillIndex(currentNode);
-        		
-        		try 
+	
+			do {
+				int pillIndex = game.getPillIndex(currentNode);
+				int powerPillIndex = game.getPowerPillIndex(currentNode);
+	
+				try 
         		{
             		if (pillIndex != -1 && game.isPillStillAvailable(pillIndex))
             		{
@@ -304,8 +283,7 @@ public class AStarPacMan extends PacmanController {
             				currentSegment.ghosts.add(ghost);
             				
             				if ((!game.isGhostEdible(ghost) || (game.isGhostEdible(ghost) && game.getGhostEdibleTime(ghost) < 2)) 
-            						&& game.getGhostLastMoveMade(ghost) == currentSegment.direction.opposite()
-            						&& game.getEuclideanDistance(pacmanCurrentNodeIndex, currentNode) <= minGhostDistance )
+            						&& game.getGhostLastMoveMade(ghost) == currentSegment.direction.opposite())
             				{
             					currentSegment.safe = false;
             					if (currentSegment.parent != null)
@@ -313,128 +291,70 @@ public class AStarPacMan extends PacmanController {
             				}
             			}
             		}
-		
-        		// Check if length is max
-        		if (currentSegment.lengthSoFar >= maxPathLength)
-        		{
-        			currentSegment.end = currentNode;    			
-        			//System.out.println("Current segment " + "start:" + currentSegment.start + ", end:" + currentSegment.end + ", direction:" + currentSegment.direction + ", ended");
-
-        			// Create a new path and insert segments that make up the path
-        			List<Segment> pathSegments = new ArrayList<>();
-        			do
-        			{
-        				pathSegments.add(currentSegment);
-        				currentSegment = currentSegment.parent;
-        			}while(currentSegment != null);
-        			
-        			Collections.reverse(pathSegments);      			
-        			Path path = new Path(pathSegments);
-        			paths.add(path);
-        			
-        			// Pop out the latest pending segment and set it as current segment
-        			if (!pendingSegments.isEmpty()) 
-        			{
-        				currentSegment = pendingSegments.remove(pendingSegments.size()-1);
-        				currentNode = currentSegment.start;
-        				currentSegment.lengthSoFar++;
-        				//System.out.println("Current segment " + "start:" + currentSegment.start + ", direction:" + currentSegment.direction + ", length so far:" + currentSegment.lengthSoFar + " begins");
-        				continue;
-        			}
-        			else
-        				break;				
-        		}
-    			     
-    			MOVE[] possibleMoves = game.getPossibleMoves(currentNode, currentSegment.direction);
-
-        		// If neighbor is a junction or a corner, end the current segment and create a new segment
-        		if (possibleMoves.length > 1 || (possibleMoves.length == 1 && possibleMoves[0] != currentSegment.direction))
-        		{
-        			currentSegment.end = currentNode;
-        			Segment parentSegment = currentSegment;
-        			
-        			for (int i = 0; i < possibleMoves.length; i++)
-        			{
-        				MOVE possibleMove = possibleMoves[i];  				
-        				int neighborNode = game.getNeighbour(currentNode, possibleMove);
-        				
-        				// Create new segment for each neighbor node
-        				Segment segment = new Segment();
-        				segment.start = neighborNode;
-        				segment.direction = possibleMove;
-        				segment.parent = parentSegment;
-        				segment.pillsCount = parentSegment.pillsCount;
-        				segment.powerPillsCount = parentSegment.powerPillsCount;
-        				segment.lengthSoFar = currentSegment.lengthSoFar;
-        				segment.safe = parentSegment.safe;
-        				        				
-                        // A* specific: Add heuristic value
-                        segment.heuristicValue = calculateHeuristic(segment, pacmanCurrentNodeIndex, game);
-                
-        				if (i == 0)
-        					currentSegment = segment;
-        				else
-        					pendingSegments.add(segment);  				
-        			}
-        		}
-        		        		
-        		// Step into next node
-    			currentNode = game.getNeighbour(currentNode, currentSegment.direction);
-    			currentSegment.lengthSoFar++; 
-
-                // Process open set using A* (modify this based on A* requirements)
-                while (!openSet.isEmpty()) {
-                    Segment current = openSet.poll();
-
-                    if (current.lengthSoFar >= maxPathLength) {
-                        List<Segment> pathSegments = new ArrayList<>();
-                        do {
-                            pathSegments.add(current);
-                            current = current.parent;
-                        } while (current != null);
-
-                        Collections.reverse(pathSegments);
-                        Path path = new Path(pathSegments);
-                        paths.add(path);
-
-                        // Clear the sets for the next iteration
-                        openSet.clear();
-                        closedSet.clear();
-
-                        break;
-                    }
-
-                    MOVE[] neighborMoves = game.getPossibleMoves(current.start, current.direction);
-                    for (MOVE neighborMove : neighborMoves) {
-                        int neighborNode = game.getNeighbour(current.start, neighborMove);
-
-                        if (closedSet.contains(neighborNode))
-                            continue;
-
-                        Segment neighborSegment = new Segment();
-                        neighborSegment.start = neighborNode;
-                        neighborSegment.direction = neighborMove;
-                        neighborSegment.parent = current;
-                        neighborSegment.lengthSoFar = current.lengthSoFar + 1;
-
-                        // Update the heuristic value for A*
-                        neighborSegment.heuristicValue = calculateHeuristic(neighborSegment, pacmanCurrentNodeIndex, game);
-
-                        openSet.add(neighborSegment);
-                    }
-
-                    closedSet.add(current);
-                }
-
-    		}
-            while(!pendingSegments.isEmpty() || currentSegment.lengthSoFar <= maxPathLength);
+	
+				if (currentSegment.lengthSoFar >= maxPathLength) {
+					currentSegment.end = currentNode;
+	
+					List<Segment> pathSegments = new ArrayList<>();
+					do {
+						pathSegments.add(currentSegment);
+						currentSegment = currentSegment.parent;
+					} while (currentSegment != null);
+	
+					Collections.reverse(pathSegments);
+					Path path = new Path(pathSegments);
+					paths.add(path);
+	
+					openSet.clear();
+					closedSet.clear();
+	
+					if (!openSet.isEmpty()) {
+						currentSegment = openSet.poll();
+						currentNode = currentSegment.start;
+						currentSegment.lengthSoFar++;
+						continue;
+					} else {
+						break;
+					}
+				}
+	
+				MOVE[] possibleMoves = game.getPossibleMoves(currentNode, currentSegment.direction);
+	
+				if (possibleMoves.length > 1 || (possibleMoves.length == 1 && possibleMoves[0] != currentSegment.direction)) {
+					currentSegment.end = currentNode;
+					Segment parentSegment = currentSegment;
+	
+					for (MOVE possibleMove : possibleMoves) {
+						int neighborNode = game.getNeighbour(currentNode, possibleMove);
+	
+						Segment segment = new Segment();
+						segment.start = neighborNode;
+						segment.direction = possibleMove;
+						segment.parent = parentSegment;
+						segment.pillsCount = parentSegment.pillsCount;
+						segment.powerPillsCount = parentSegment.powerPillsCount;
+						segment.lengthSoFar = currentSegment.lengthSoFar;
+						segment.safe = parentSegment.safe;
+	
+						if (possibleMove == possibleMoves[0]) {
+							currentSegment = segment;
+						} else {
+							openSet.add(segment);
+						}
+					}
+				}
+	
+				currentNode = game.getNeighbour(currentNode, currentSegment.direction);
+				currentSegment.lengthSoFar++;
+	
+			} while (!openSet.isEmpty() || currentSegment.lengthSoFar <= maxPathLength);
 		}
-    	
-    	// Required to calculate the required data in each path
-    	for (Path path : paths)
+	
+		for (Path path : paths) {
 			path.process();
-    	
-    	System.out.println("\nPath search complete found " + paths.size() + " path");
-    	return paths;
-    }
+		}
+	
+		System.out.println("\nPath search complete found " + paths.size() + " path");
+		return paths;
+	}
 }
