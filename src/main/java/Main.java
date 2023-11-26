@@ -4,6 +4,7 @@ import examples.StarterGhostComm.Inky;
 import examples.StarterGhostComm.Pinky;
 import examples.StarterGhostComm.Sue;
 import examples.StarterPacMan.*;
+import examples.StarterPacMan.MonteCarloPacMan.MCTS;
 import pacman.Executor;
 import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
@@ -42,6 +43,7 @@ public class Main {
         int speed = 1; // smaller number will run faster
         
         MASController ghosts = new POCommGhosts(50);
-        executor.runGame(new TreeSearchPacMan(), ghosts, speed); 
+        executor.runGame(new MCTS(), ghosts, speed); 
+
     }
 }
