@@ -70,9 +70,11 @@ public class FitnessWithTreeSearch extends PacmanController {
         // Sort the path with highest value DESC
         Collections.sort(paths, new PathValueComparator());
 
-        for (Path path : paths) {
-            path.summary(game);
-        }
+        // for (Path path : paths) {
+        // path.summary(game);
+        // }
+        System.out.println("Level " + game.getCurrentLevel() + " Time " + game.getCurrentLevelTime() + " Score "
+                + game.getScore() + " Tt time " + game.getTotalTime());
 
         Path bestPath = paths.get(0);
         MOVE bestPathMove = game.getMoveToMakeToReachDirectNeighbour(pacmanCurrentNodeIndex, bestPath.start);
