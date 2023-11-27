@@ -5,7 +5,7 @@ import examples.StarterGhostComm.Blinky;
 import examples.StarterGhostComm.Inky;
 import examples.StarterGhostComm.Pinky;
 import examples.StarterGhostComm.Sue;
-import examples.StarterPacMan.TreeSearchPacMan;
+import examples.StarterPacMan.DijkstraPacMan;
 import pacman.Executor;
 import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
@@ -40,7 +40,9 @@ public class Main {
 
         MASController ghosts = new POCommGhosts(50);
 
+        // executor.runGame(new AStarPacMan(), ghosts, speed);
+        executor.runGame(new DijkstraPacMan(), ghosts, speed);
         // executor.runGame(new TreeSearchPacMan(), ghosts, speed);
-        executor.runGame(new TreeSearchPacMan(), ghosts, speed);
+
     }
 }

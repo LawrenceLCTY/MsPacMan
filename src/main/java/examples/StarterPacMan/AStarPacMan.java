@@ -39,21 +39,17 @@ public class AStarPacMan extends PacmanController {
 
 		int level = game.getCurrentLevel();
 
-		if (prevLevel != level) {
-			System.out.println("Level " + game.getCurrentLevel() + " Score " + game.getScore() + " Total time "
-					+ game.getTotalTime());
-		}
-
 		this.game = game;
 		pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
 		pacmanLastMoveMade = game.getPacmanLastMoveMade();
-		// fitness
+
 		if (prevLevel != level) {
 			double livesRemaining = livesRemaining();
 			double speed = calculateSpeed();
-			double timeperlevel = game.getTotalTime() / level;
+			// double timeperlevel = game.getTotalTime() / level;
+			double timeLevelRatio = calculateTimeLevelRatio(game.getCurrentLevel(), game.getTotalTime());
 
-			fitnessData.recordFitness(level, livesRemaining, speed, timeperlevel);
+			fitnessData.recordFitness(level, livesRemaining, speed, timeLevelRatio);
 			System.out.println("hehe");
 			fitnessData.printData();
 
@@ -450,5 +446,19 @@ public class AStarPacMan extends PacmanController {
 		}
 
 		return (double) totalScore / totalTime;
+	}
+
+	private double calculateTimeLevelRatio(int levelsPlayed, int totalElapsedTime) {
+		int currentTime = game.getTotalTime();
+		int currentLevel = game.getCurrentLevel();
+
+		if (currentLevel > levelsPlayed) {
+			levelsPlayed = currentLevel;
+			totalElapsedTime = 0;
+		}
+		totalElapsedTime = currentTime;
+		double fitnessScore = (double) totalElapsedTime / levelsPlayed;
+
+		return fitnessScore;
 	}
 }
