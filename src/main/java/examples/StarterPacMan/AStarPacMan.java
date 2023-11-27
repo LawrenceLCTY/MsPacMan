@@ -34,13 +34,22 @@ public class AStarPacMan extends PacmanController {
 	 int pathLengthBase = 100; // 70, 70, 100 // Make it longer when no pills around
 	 int minGhostDistanceBase = 100; // 80, 100, 100
 	 private List<Path> paths = new ArrayList<>();
+
 	
 	// for fitness function
 	int prevLevel = 0;
 	FitnessData fitnessData = new FitnessData();
 		 
+
     @Override
     public MOVE getMove(Game game, long timeDue) {
+
+		int level = game.getCurrentLevel();
+		
+		if (lastLevel != level){
+			System.out.println("Level " + game.getCurrentLevel() + " Score " + game.getScore() + " Total time " + game.getTotalTime());
+		}
+		
 		this.game = game;
     	pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
     	pacmanLastMoveMade = game.getPacmanLastMoveMade();
@@ -126,7 +135,6 @@ public class AStarPacMan extends PacmanController {
     		}
 		}
     	
-    	
     	return bestPathMove;
     }
     
@@ -190,7 +198,7 @@ public class AStarPacMan extends PacmanController {
     		else
     			System.out.println(text);
 
-    		render(game);
+    		//render(game);
     	}
     
     	public void process()

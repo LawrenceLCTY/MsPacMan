@@ -41,7 +41,8 @@ public class Main {
 
         MASController ghosts = new POCommGhosts(50);
 
-        // executor.runGame(new TreeSearchPacMan(), ghosts, speed);
-        executor.runGame(new TreeSearchPacMan(), ghosts, speed);
+        executor.runGame( new AStarPacMan(), ghosts, speed); 
+        //executor.runGame(new TreeSearchPacMan(), ghosts, speed); 
+
     }
 }
