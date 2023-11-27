@@ -51,14 +51,18 @@ public class TreeSearchPacMan extends PacmanController {
     	pacmanLastMoveMade = game.getPacmanLastMoveMade();
     	
 		
-		//fitness
+		// fitness
 		int level = game.getCurrentLevel();
 		if (prevLevel != level) {
+			double livesRemaining = livesRemaining();
 			double speed = calculateSpeed();
-			double pillConsumption = calculatePillConsumption();
-			fitnessData.recordFitness(level, speed, pillConsumption, 0);
+
+			fitnessData.recordFitness(level, livesRemaining, speed, 0);
+			System.out.println("hehe");
 			fitnessData.printData();
-			// System.out.println("Level " + level + " Fitness Score: " + speed + " " + pillConsumption);
+			
+			// Print current game state
+			System.out.println("Level: " + level + ", Score: " + game.getScore() + ", Total Time: " + game.getTotalTime());
 
 		}
 		prevLevel = level;
@@ -383,21 +387,9 @@ public class TreeSearchPacMan extends PacmanController {
 		return paths;
 	}
 
-	
-	private double calculatePillConsumption(){
-		// for fitness function
-		int pillsEaten = game.getNumberOfPills() + game.getNumberOfPowerPills() - game.getNumberOfActivePowerPills() - game.getNumberOfActivePills();
-		long timeElapsed = game.getTotalTime();
-
-		// Calculate fitness score
-		// Objective: Speed and Pellet Consumption
-		// FitnessScore = (pelletsEaten * 5) - (timeElapsed * 0.2)
-		// Prioritizes quickly consuming pellets.
-		// Penalizes time elapsed to encourage faster completion.
-        double fitnessScore = (pillsEaten * 5) - (timeElapsed * 0.2);
-		return fitnessScore;
+	private int livesRemaining() {
+		return game.getPacmanNumberOfLivesRemaining();
 	}
-
 
 	private double calculateSpeed() {
         // Logic to calculate fitness score based on total score and total time
@@ -411,6 +403,9 @@ public class TreeSearchPacMan extends PacmanController {
 
         return (double) totalScore / totalTime;
     }
+
+
+
 
 
 	
