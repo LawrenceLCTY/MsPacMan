@@ -34,8 +34,13 @@ public class AStarPacMan extends PacmanController {
 	 int pathLengthBase = 100; // 70, 70, 100 // Make it longer when no pills around
 	 int minGhostDistanceBase = 100; // 80, 100, 100
 	 private List<Path> paths = new ArrayList<>();
-	 int lastLevel = 1;
-	 
+
+	
+	// for fitness function
+	int prevLevel = 0;
+	FitnessData fitnessData = new FitnessData();
+		 
+
     @Override
     public MOVE getMove(Game game, long timeDue) {
 
@@ -48,7 +53,23 @@ public class AStarPacMan extends PacmanController {
 		this.game = game;
     	pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
     	pacmanLastMoveMade = game.getPacmanLastMoveMade();
-    		   	
+		// fitness
+		int level = game.getCurrentLevel();
+		if (prevLevel != level) {
+			double livesRemaining = livesRemaining();
+			double speed = calculateSpeed();
+			double timeperlevel = game.getTotalTime()/level;
+
+			fitnessData.recordFitness(level, livesRemaining, speed, timeperlevel);
+			System.out.println("hehe");
+			fitnessData.printData();
+			
+			// Print current game state
+			System.out.println("Level: " + level + ", Score: " + game.getScore() + ", Total Time: " + game.getTotalTime());
+
+		}
+		prevLevel = level;
+
     	// Random path length and minGhostDistance
     	int pathLength = pathLengthBase /*+ getRandomInt(-50, 10)*/;
     	
@@ -441,7 +462,24 @@ public class AStarPacMan extends PacmanController {
     	for (Path path : paths)
 			path.process();
     	
-    	System.out.println("\nPath search complete found " + paths.size() + " path");
+    	// System.out.println("\nPath search complete found " + paths.size() + " path");
     	return paths;
+    }
+
+	private int livesRemaining() {
+		return game.getPacmanNumberOfLivesRemaining();
+	}
+
+	private double calculateSpeed() {
+        // Logic to calculate fitness score based on total score and total time
+        int totalScore = game.getScore();
+        int totalTime = game.getTotalTime();
+        
+        // Ensure totalTime is not zero to avoid division by zero
+        if (totalTime == 0) {
+            return 0.0;
+        }
+
+        return (double) totalScore / totalTime;
     }
 }

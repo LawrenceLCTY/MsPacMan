@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import examples.StarterPacMan.FitnessData;
 import pacman.controllers.Controller;
 import pacman.controllers.PacmanController;
 import pacman.controllers.examples.Legacy;
@@ -31,21 +32,39 @@ public class MCTS extends PacmanController{
 	Controller<EnumMap<GHOST,MOVE>> ghosts = new Legacy();
 	
 	public static Set<Integer> junctions;
-	int lastLevel = 1;
+	// int lastLevel = 1;
 	Maze maze3;
 	boolean useScript = false;
 	MOVE scriptMove = MOVE.LEFT;
 	
+	// for fitness function
+	int prevLevel = 0;
+	FitnessData fitnessData = new FitnessData();
+
 	@Override
 	public MOVE getMove(Game game, long timeDue) {
-		
+		// fitness
 		int level = game.getCurrentLevel();
-		
-		if (junctions == null || lastLevel != level){
+		if (prevLevel != level) {
+			double livesRemaining = livesRemaining(game);
+			double speed = calculateSpeed(game);
+			double timeperlevel = game.getTotalTime()/level;
+
+			fitnessData.recordFitness(level, livesRemaining, speed, timeperlevel);
+			fitnessData.printData();
+			
+			// Print current game state
+			System.out.println("Level: " + level + ", Score: " + game.getScore() + ", Total Time: " + game.getTotalTime());
+
+		}
+		if (junctions == null || prevLevel != level){
 			junctions = getJunctions(game);
 		}
+		prevLevel = level;
 		
-		lastLevel = level;
+		
+
+		
 		
 		return MctsSearch(game, 50);
 		
@@ -271,5 +290,23 @@ public class MCTS extends PacmanController{
 			sum += game.getDistance(game.getPacmanCurrentNodeIndex(), game.getGhostCurrentNodeIndex(ghost), DM.PATH);
 		return sum/4;
 	}
+
+	
+	private int livesRemaining(Game game) {
+		return game.getPacmanNumberOfLivesRemaining();
+	}
+
+	private double calculateSpeed(Game game) {
+        // Logic to calculate fitness score based on total score and total time
+        int totalScore = game.getScore();
+        int totalTime = game.getTotalTime();
+        
+        // Ensure totalTime is not zero to avoid division by zero
+        if (totalTime == 0) {
+            return 0.0;
+        }
+
+        return (double) totalScore / totalTime;
+    }
 	
 }
