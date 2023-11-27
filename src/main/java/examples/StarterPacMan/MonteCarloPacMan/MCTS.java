@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import pacman.controllers.Controller;
+import pacman.controllers.PacmanController;
 import pacman.controllers.examples.Legacy;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
@@ -17,13 +18,13 @@ import pacman.game.internal.Maze;
 import pacman.game.internal.Node;
 import pacman.game.Game;
 
-public class MCTS extends Controller<MOVE>{
+public class MCTS extends PacmanController{
 
 	public static final int NEW_LIFE_VALUE = 0;
 	public static final int LOST_LIFE_VALUE = -500;
 	private static final int SIM_STEPS = 200;
 	private static final int TREE_TIME_LIMIT = 55;
-	private static final int MISSUSE_OF_POWER_PILL = -50;
+	private static final int MISSUSE_OF_POWER_PILL = -100;
 	private static final int GHOST_DISTANCE = 200;
 	// Hoeffding ineqality
 	float C = (float) (1f / Math.sqrt(2));
