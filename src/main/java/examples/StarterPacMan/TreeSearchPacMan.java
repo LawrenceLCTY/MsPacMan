@@ -56,8 +56,9 @@ public class TreeSearchPacMan extends PacmanController {
 		if (prevLevel != level) {
 			double livesRemaining = livesRemaining();
 			double speed = calculateSpeed();
+			double timeperlevel = game.getTotalTime()/level;
 
-			fitnessData.recordFitness(level, livesRemaining, speed, 0);
+			fitnessData.recordFitness(level, livesRemaining, speed, timeperlevel);
 			System.out.println("hehe");
 			fitnessData.printData();
 			
