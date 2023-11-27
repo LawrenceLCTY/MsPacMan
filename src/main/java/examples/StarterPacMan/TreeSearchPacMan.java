@@ -31,6 +31,8 @@ public class TreeSearchPacMan extends PacmanController {
 	 int pathLengthBase = 100; // 70, 70, 100 // Make it longer when no pills around
 	 int minGhostDistanceBase = 100; // 80, 100, 100
 	 private List<Path> paths = new ArrayList<>();
+
+	
 	 
 	private int getRandomInt(int min, int max){
 		if (min >= max) {
@@ -41,12 +43,33 @@ public class TreeSearchPacMan extends PacmanController {
 		return r.nextInt((max - min) + 1) + min;		
 	}
 	 
+	// for fitness function
+	int prevLevel = 0;
+	FitnessData fitnessData = new FitnessData();
+	
     @Override
     public MOVE getMove(Game game, long timeDue) {
+	
+
 		this.game = game;
     	pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
     	pacmanLastMoveMade = game.getPacmanLastMoveMade();
-    		   	
+    	
+		
+		//fitness
+		int level = game.getCurrentLevel();
+		if (prevLevel != level) {
+			double speed = calculateSpeed();
+			double pillConsumption = calculatePillConsumption();
+			fitnessData.recordFitness(level, speed, pillConsumption, 0);
+			fitnessData.printData();
+			// System.out.println("Level " + level + " Fitness Score: " + speed + " " + pillConsumption);
+
+		}
+		prevLevel = level;
+
+
+
     	// Random path length and minGhostDistance
     	int pathLength = pathLengthBase /*+ getRandomInt(-50, 10)*/;
     	
@@ -56,10 +79,10 @@ public class TreeSearchPacMan extends PacmanController {
     	// Sort the path with highest value DESC
     	Collections.sort(paths, new PathValueComparator());
 
-    	for (Path path: paths)
-    	{
-        	path.summary(game); 
-    	}
+    	// for (Path path: paths)
+    	// {
+        // 	path.summary(game); 
+    	// }
     	
     	Path bestPath = paths.get(0);
     	MOVE bestPathMove = game.getMoveToMakeToReachDirectNeighbour(pacmanCurrentNodeIndex, bestPath.start);
@@ -112,7 +135,8 @@ public class TreeSearchPacMan extends PacmanController {
     		}
 		}
     	
-    	
+		// System.out.println("Best Path: " + bestPathMove + " " + bestPath.value);
+
     	return bestPathMove;
     }
     
@@ -381,7 +405,41 @@ public class TreeSearchPacMan extends PacmanController {
     	for (Path path : paths)
 			path.process();
     	
-    	System.out.println("\nPath search complete found " + paths.size() + " path");
+    	// System.out.println("\nPath search complete found " + paths.size() + " path");
     	return paths;
     }
+
+	
+	private double calculatePillConsumption(){
+		// for fitness function
+		int pillsEaten = game.getNumberOfPills() + game.getNumberOfPowerPills() - game.getNumberOfActivePowerPills() - game.getNumberOfActivePills();
+		long timeElapsed = game.getTotalTime();
+
+		// Calculate fitness score
+		// Objective: Speed and Pellet Consumption
+		// FitnessScore = (pelletsEaten * 5) - (timeElapsed * 0.2)
+		// Prioritizes quickly consuming pellets.
+		// Penalizes time elapsed to encourage faster completion.
+        double fitnessScore = (pillsEaten * 5) - (timeElapsed * 0.2);
+		return fitnessScore;
+	}
+
+
+	private double calculateSpeed() {
+        // Logic to calculate fitness score based on total score and total time
+        int totalScore = game.getScore();
+        int totalTime = game.getTotalTime();
+        
+        // Ensure totalTime is not zero to avoid division by zero
+        if (totalTime == 0) {
+            return 0.0;
+        }
+
+        return (double) totalScore / totalTime;
+    }
+
+
+	
+
+
 }
