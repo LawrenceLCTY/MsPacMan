@@ -5,7 +5,6 @@ import examples.StarterGhostComm.Blinky;
 import examples.StarterGhostComm.Inky;
 import examples.StarterGhostComm.Pinky;
 import examples.StarterGhostComm.Sue;
-import examples.StarterPacMan.*;
 import examples.StarterPacMan.MonteCarloPacMan.MCTS;
 import pacman.Executor;
 import pacman.controllers.IndividualGhostController;
@@ -41,8 +40,11 @@ public class Main {
 
         MASController ghosts = new POCommGhosts(50);
 
-        executor.runGame( new AStarPacMan(), ghosts, speed); 
-        //executor.runGame(new TreeSearchPacMan(), ghosts, speed); 
+        // executor.runGame(new AStarPacMan(), ghosts, speed);
+        executor.runGame(new MCTS(), ghosts, speed);
+        // executor.runGame(new TreeSearchPacMan(), ghosts, speed);
+        // executor.runGame( new AStarPacMan(), ghosts, speed); 
+
 
     }
 }
