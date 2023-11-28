@@ -19,17 +19,15 @@ import pacman.game.GameView;
  * be placed in this package or sub-packages (e.g., entrants.pacman.username).
  */
 public class TreeSearchPacMan extends PacmanController {
-	 private static final Random RANDOM = new Random(); 
-	 private Game game;
-	 private int pacmanCurrentNodeIndex;
-	 MOVE pacmanLastMoveMade; 
-	 int pathLengthBase = 100; // 70, 70, 100 // Make it longer when no pills around
-	 int minGhostDistanceBase = 100; // 80, 100, 100
-	 private List<Path> paths = new ArrayList<>();
+	private static final Random RANDOM = new Random();
+	private Game game;
+	private int pacmanCurrentNodeIndex;
+	MOVE pacmanLastMoveMade;
+	int pathLengthBase = 100; // 70, 70, 100 // Make it longer when no pills around
+	int minGhostDistanceBase = 100; // 80, 100, 100
+	private List<Path> paths = new ArrayList<>();
 
-	
-	 
-	private int getRandomInt(int min, int max){
+	private int getRandomInt(int min, int max) {
 		if (min >= max) {
 			throw new IllegalArgumentException("max must be greater than min");
 		}
@@ -37,62 +35,56 @@ public class TreeSearchPacMan extends PacmanController {
 		Random r = new Random();
 		return r.nextInt((max - min) + 1) + min;
 	}
-	 
+
 	// for fitness function
 	int prevLevel = 0;
 	FitnessData fitnessData = new FitnessData();
-	
-    @Override
-    public MOVE getMove(Game game, long timeDue) {
-	
+
+	@Override
+	public MOVE getMove(Game game, long timeDue) {
 
 		this.game = game;
-    	pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
-    	pacmanLastMoveMade = game.getPacmanLastMoveMade();
-    	
-		
+		pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
+		pacmanLastMoveMade = game.getPacmanLastMoveMade();
+
 		// fitness
 		int level = game.getCurrentLevel();
 		if (prevLevel != level) {
 			double livesRemaining = livesRemaining();
 			double speed = calculateSpeed();
+			double timeLevelRatio = calculateTimeLevelRatio(game.getTotalTime(), game.getCurrentLevel());
 
-			double timeperlevel = game.getTotalTime()/level;
-
-			fitnessData.recordFitness(level, livesRemaining, speed, timeperlevel);
+			fitnessData.recordFitness(level, livesRemaining, speed, timeLevelRatio);
 
 			System.out.println("hehe");
 			fitnessData.printData();
-			
+
 			// Print current game state
-			System.out.println("Level: " + level + ", Score: " + game.getScore() + ", Total Time: " + game.getTotalTime());
+			System.out.println(
+					"Level: " + level + ", Score: " + game.getScore() + ", Total Time: " + game.getTotalTime());
 
 		}
 		prevLevel = level;
 
+		// Random path length and minGhostDistance
+		int pathLength = pathLengthBase /* + getRandomInt(-50, 10) */;
 
+		// Get possible paths
+		paths = getPaths(pathLength);
 
-    	// Random path length and minGhostDistance
-    	int pathLength = pathLengthBase /*+ getRandomInt(-50, 10)*/;
-    	
-    	// Get possible paths
-    	paths = getPaths(pathLength);
-    	
-    	// Sort the path with highest value DESC
-    	Collections.sort(paths, new PathValueComparator());
+		// Sort the path with highest value DESC
+		Collections.sort(paths, new PathValueComparator());
 
-    	// for (Path path: paths)
-    	// {
-        // 	path.summary(game); 
-    	// }
-    	
-    	Path bestPath = paths.get(0);
-    	MOVE bestPathMove = game.getMoveToMakeToReachDirectNeighbour(pacmanCurrentNodeIndex, bestPath.start);
-    	
-    	
-    	// No pills around while at junction but has safe paths, choose random safe path
-    	if (bestPath.value == 0 && game.isJunction(pacmanCurrentNodeIndex))
-		{			
+		// for (Path path: paths)
+		// {
+		// path.summary(game);
+		// }
+
+		Path bestPath = paths.get(0);
+		MOVE bestPathMove = game.getMoveToMakeToReachDirectNeighbour(pacmanCurrentNodeIndex, bestPath.start);
+
+		// No pills around while at junction but has safe paths, choose random safe path
+		if (bestPath.value == 0 && game.isJunction(pacmanCurrentNodeIndex)) {
 			// Get only safe paths from paths
 			List<MOVE> safeMoves = new ArrayList<>();
 			for (Path path : paths) {
@@ -129,21 +121,19 @@ public class TreeSearchPacMan extends PacmanController {
 				}
 			}
 		}
-    	
+
 		// System.out.println("Best Path: " + bestPathMove + " " + bestPath.value);
 
-    	return bestPathMove;
-    }
-    
-    private MOVE getRandomMove()
-    {
-    	MOVE[] possibleMoves = game.getPossibleMoves(pacmanCurrentNodeIndex, pacmanLastMoveMade);    	
-    	
-    	return possibleMoves[RANDOM.nextInt(possibleMoves.length)];
-    }
-    
-    public class PathValueComparator implements Comparator<Path>
-    {    	
+		return bestPathMove;
+	}
+
+	private MOVE getRandomMove() {
+		MOVE[] possibleMoves = game.getPossibleMoves(pacmanCurrentNodeIndex, pacmanLastMoveMade);
+
+		return possibleMoves[RANDOM.nextInt(possibleMoves.length)];
+	}
+
+	public class PathValueComparator implements Comparator<Path> {
 		@Override
 		public int compare(Path path1, Path path2) {
 			return path2.value - path1.value;
@@ -395,23 +385,30 @@ public class TreeSearchPacMan extends PacmanController {
 	}
 
 	private double calculateSpeed() {
-        // Logic to calculate fitness score based on total score and total time
-        int totalScore = game.getScore();
-        int totalTime = game.getTotalTime();
-        
-        // Ensure totalTime is not zero to avoid division by zero
-        if (totalTime == 0) {
-            return 0.0;
-        }
+		// Logic to calculate fitness score based on total score and total time
+		int totalScore = game.getScore();
+		int totalTime = game.getTotalTime();
 
-        return (double) totalScore / totalTime;
-    }
+		// Ensure totalTime is not zero to avoid division by zero
+		if (totalTime == 0) {
+			return 0.0;
+		}
 
+		return (double) totalScore / totalTime;
+	}
 
+	private double calculateTimeLevelRatio(int levelsPlayed, int totalElapsedTime) {
+		int currentTime = game.getTotalTime();
+		int currentLevel = game.getCurrentLevel();
 
+		if (currentLevel > levelsPlayed) {
+			levelsPlayed = currentLevel;
+			totalElapsedTime = 0;
+		}
+		totalElapsedTime = currentTime;
+		double fitnessScore = (double) totalElapsedTime / levelsPlayed;
 
-
-	
-
+		return fitnessScore;
+	}
 
 }
