@@ -462,3 +462,5 @@ public class AStarPacMan extends PacmanController {
 		return fitnessScore;
 	}
 }
+
+// #toremove: push not shown
