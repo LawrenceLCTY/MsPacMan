@@ -34,6 +34,7 @@ public class DijkstraPacMan extends PacmanController {
 	// for fitness function
 	int prevLevel = 0;
 	FitnessData fitnessData = new FitnessData();
+	long actualTime = System.currentTimeMillis();
 
 	@Override
 	public MOVE getMove(Game game, long timeDue) {
@@ -55,8 +56,13 @@ public class DijkstraPacMan extends PacmanController {
 
 			// Print current game state
 			System.out.println(
-					"Level: " + level + ", Score: " + game.getScore() + ", Total Time: " + game.getTotalTime());
-
+				"Level: " + level + 
+				", Score: " + game.getScore() + 
+				", Game Time: " + game.getTotalTime() +
+				", Actual Time: " + (System.currentTimeMillis() - actualTime) + "ms");
+				
+			//update actual game duration
+			actualTime = System.currentTimeMillis();
 		}
 		prevLevel = level;
 
