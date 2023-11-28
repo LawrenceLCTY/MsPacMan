@@ -47,12 +47,10 @@ public class AStarPacMan extends PacmanController {
 
 		if (prevLevel != level) {
 			double livesRemaining = livesRemaining();
-			double speed = calculateSpeed();
-			// double timeperlevel = game.getTotalTime() / level;
+			double scoreTimeRatio = calculateScoreTimeRatio();
 			double timeLevelRatio = calculateTimeLevelRatio(game.getCurrentLevel(), game.getTotalTime());
 
-			fitnessData.recordFitness(level, livesRemaining, speed, timeLevelRatio);
-			System.out.println("hehe");
+			fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio, timeLevelRatio);
 			fitnessData.printData();
 
 			// Print current game state
@@ -445,9 +443,7 @@ public class AStarPacMan extends PacmanController {
 		return game.getPacmanNumberOfLivesRemaining();
 	}
 
-	private double calculateSpeed() {
-
-		// Logic to calculate fitness score based on total score and total time
+	private double calculateScoreTimeRatio() {
 		int totalScore = game.getScore();
 		int totalTime = game.getTotalTime();
 

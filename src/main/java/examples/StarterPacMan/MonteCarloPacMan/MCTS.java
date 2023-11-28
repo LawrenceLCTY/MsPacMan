@@ -48,12 +48,10 @@ public class MCTS extends PacmanController {
 		int level = game.getCurrentLevel();
 		if (prevLevel != level) {
 			double livesRemaining = livesRemaining(game);
-			double speed = calculateSpeed(game);
-
-			// double timeperlevel = game.getTotalTime()/level;
+			double scoreTimeRatio = calculateScoreTimeRatio(game);
 			double timeLevelRatio = calculateTimeLevelRatio(game, game.getCurrentLevel(), game.getTotalTime());
 
-			fitnessData.recordFitness(level, livesRemaining, speed, timeLevelRatio);
+			fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio, timeLevelRatio);
 			fitnessData.printData();
 
 			
@@ -298,8 +296,7 @@ public class MCTS extends PacmanController {
 		return game.getPacmanNumberOfLivesRemaining();
 	}
 
-	private double calculateSpeed(Game game) {
-		// Logic to calculate fitness score based on total score and total time
+	private double calculateScoreTimeRatio(Game game) {
 		int totalScore = game.getScore();
 		int totalTime = game.getTotalTime();
 

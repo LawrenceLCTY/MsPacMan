@@ -46,11 +46,10 @@ public class DijkstraPacMan extends PacmanController {
 		int level = game.getCurrentLevel();
 		if (prevLevel != level || game.gameOver()) {
 			double livesRemaining = livesRemaining();
-			double speed = calculateScoreTimeRatio();
+			double scoreTimeRatio = calculateScoreTimeRatio();
 			double timeLevelRatio = calculateTimeLevelRatio(game.getCurrentLevel(), game.getTotalTime());
 
-			fitnessData.recordFitness(level, livesRemaining, speed, timeLevelRatio);
-			System.out.println("hehe");
+			fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio, timeLevelRatio);
 			fitnessData.printData();
 
 			// Print current game state
