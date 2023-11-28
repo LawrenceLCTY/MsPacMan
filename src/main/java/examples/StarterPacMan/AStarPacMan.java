@@ -22,6 +22,7 @@ import pacman.game.GameView;
  * be placed in this package or sub-packages (e.g., entrants.pacman.username).
  */
 public class AStarPacMan extends PacmanController {
+
 	private static final Random RANDOM = new Random();
 	private Game game;
 	private int pacmanCurrentNodeIndex;
@@ -56,6 +57,7 @@ public class AStarPacMan extends PacmanController {
 			// Print current game state
 			System.out.println(
 					"Level: " + level + ", Score: " + game.getScore() + ", Total Time: " + game.getTotalTime());
+
 
 		}
 		prevLevel = level;
@@ -133,6 +135,7 @@ public class AStarPacMan extends PacmanController {
 	}
 
 	public class PathValueComparator implements Comparator<Path> {
+
 		@Override
 		public int compare(Path path1, Path path2) {
 			return path2.value - path1.value;
@@ -436,6 +439,7 @@ public class AStarPacMan extends PacmanController {
 	}
 
 	private double calculateSpeed() {
+
 		// Logic to calculate fitness score based on total score and total time
 		int totalScore = game.getScore();
 		int totalTime = game.getTotalTime();

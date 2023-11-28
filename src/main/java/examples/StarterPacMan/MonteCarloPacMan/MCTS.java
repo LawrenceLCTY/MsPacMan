@@ -48,6 +48,7 @@ public class MCTS extends PacmanController {
 		if (prevLevel != level) {
 			double livesRemaining = livesRemaining(game);
 			double speed = calculateSpeed(game);
+
 			// double timeperlevel = game.getTotalTime()/level;
 			double timeLevelRatio = calculateTimeLevelRatio(game, game.getCurrentLevel(), game.getTotalTime());
 
@@ -318,5 +319,3 @@ public class MCTS extends PacmanController {
 	}
 
 }
-
-// #toremove: push not shown

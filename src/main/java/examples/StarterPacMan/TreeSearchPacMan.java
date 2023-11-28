@@ -55,6 +55,7 @@ public class TreeSearchPacMan extends PacmanController {
 			double timeLevelRatio = calculateTimeLevelRatio(game.getTotalTime(), game.getCurrentLevel());
 
 			fitnessData.recordFitness(level, livesRemaining, speed, timeLevelRatio);
+
 			System.out.println("hehe");
 			fitnessData.printData();
 

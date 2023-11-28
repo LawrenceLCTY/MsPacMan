@@ -43,6 +43,8 @@ public class Main {
         // executor.runGame(new AStarPacMan(), ghosts, speed);
         executor.runGame(new MCTS(), ghosts, speed);
         // executor.runGame(new TreeSearchPacMan(), ghosts, speed);
+        // executor.runGame( new AStarPacMan(), ghosts, speed); 
+
 
     }
 }

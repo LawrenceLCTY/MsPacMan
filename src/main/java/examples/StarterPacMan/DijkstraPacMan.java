@@ -22,6 +22,7 @@ import pacman.game.GameView;
  * be placed in this package or sub-packages (e.g., entrants.pacman.username).
  */
 public class DijkstraPacMan extends PacmanController {
+
 	private static final Random RANDOM = new Random();
 	private Game game;
 	private int pacmanCurrentNodeIndex;
@@ -78,6 +79,7 @@ public class DijkstraPacMan extends PacmanController {
 
 		// No pills around while at junction but has safe paths, choose random safe path
 		if (bestPath.value == 0 && game.isJunction(pacmanCurrentNodeIndex)) {
+
 			// Get only safe paths from paths
 			List<MOVE> safeMoves = new ArrayList<>();
 			for (Path path : paths) {
@@ -384,6 +386,3 @@ public class DijkstraPacMan extends PacmanController {
 		return fitnessScore;
 	}
 }
-
-
-// #toremove: push not shown
