@@ -1,16 +1,13 @@
 
 import java.util.EnumMap;
 
-import examples.StarterGhostComm.Blinky;
-import examples.StarterGhostComm.Inky;
-import examples.StarterGhostComm.Pinky;
-import examples.StarterGhostComm.Sue;
+import examples.StarterGhostComm.*;
 import examples.StarterPacMan.*; //for import Dijkstra and A*
 import examples.StarterPacMan.MonteCarloPacMan.MCTS;
 import pacman.Executor;
 import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
-import pacman.controllers.examples.po.POCommGhosts;
+// import pacman.controllers.examples.po.POCommGhosts;
 import pacman.game.Constants.GHOST;
 import pacman.game.internal.POType;
 
@@ -39,12 +36,14 @@ public class Main {
 
         int speed = 1; // smaller number will run faster
 
-        MASController ghosts = new POCommGhosts(50);
+        // MASController ghosts = new POCommGhost(50);
+        // MASController ghosts = new POCommGhosts(50);
+        MASController ghosts = new CommGhosts(50, "astar");
 
         // executor.runGame(new DijkstraPacMan(), ghosts, speed);
-        executor.runGame(new MCTS(), ghosts, speed);
+        // executor.runGame(new MCTS(), ghosts, speed);
         // executor.runGame(new TreeSearchPacMan(), ghosts, speed);
-        // executor.runGame( new AStarPacMan(), ghosts, speed); 
+        executor.runGame( new AStarPacMan(), ghosts, speed); 
 
 
     }
