@@ -7,7 +7,14 @@ import pacman.game.comms.BasicMessage;
 import pacman.game.comms.Message;
 import pacman.game.comms.Messenger;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.Set;
 
 
 /**
@@ -83,8 +90,11 @@ public class POAStarGhost extends IndividualGhostController {
                 } else {
                     if (rnd.nextFloat() < CONSISTENCY) {            //attack Ms Pac-Man otherwise (with certain probability)
                         try {
-                            Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
-                                    pacmanIndex, game.getGhostLastMoveMade(ghost), Constants.DM.PATH);
+                            // Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
+                            //         pacmanIndex, game.getGhostLastMoveMade(ghost), Constants.DM.PATH);
+                            Constants.MOVE move = aStarSearch(game.getGhostCurrentNodeIndex(ghost),
+                                                            pacmanIndex, game, ghost);
+                    
                             return move;
                         } catch (ArrayIndexOutOfBoundsException e) {
                             System.out.println(e);
@@ -98,6 +108,57 @@ public class POAStarGhost extends IndividualGhostController {
             }
         }
         return null;
+    }
+
+    // A* Search Implementation with Heuristic Function
+    public Constants.MOVE aStarSearch(int ghostCurrentNodeIndex, int pacmanIndex, Game game, Constants.GHOST ghost) {
+        PriorityQueue<int[]> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(arr -> calculateAStarPriority(arr, pacmanIndex, game, ghost)));
+        Set<Integer> explored = new HashSet<>();
+        int[] neighbouringNodes = game.getNeighbouringNodes(ghostCurrentNodeIndex);
+    
+        for (int node : neighbouringNodes) {
+            int priority = calculateAStarPriority(new int[]{node, node}, pacmanIndex, game, ghost);
+            priorityQueue.add(new int[]{node, node, priority});
+        }
+    
+        while (!priorityQueue.isEmpty()) {
+            int[] current = priorityQueue.remove();
+            int parentNode = current[0];
+            int currentNode = current[1];
+    
+            if (!explored.contains(currentNode)) {
+                explored.add(currentNode);
+            }
+    
+            if (currentNode == pacmanIndex) {
+                return game.getMoveToMakeToReachDirectNeighbour(ghostCurrentNodeIndex, parentNode);
+            }
+    
+            for (int nextNode : game.getNeighbouringNodes(currentNode)) {
+                if (nextNode != -1 && !explored.contains(nextNode)) {
+                    int priority = calculateAStarPriority(new int[]{currentNode, nextNode}, pacmanIndex, game, ghost);
+                    priorityQueue.add(new int[]{currentNode, nextNode, priority});
+                }
+            }
+        }
+    
+        return null;
+    }
+    
+    private int calculateAStarPriority(int[] nodes, int pacmanIndex, Game game, Constants.GHOST ghost) {
+        int currentNode = nodes[1];
+        int pacmanXCood = game.getNodeXCood(pacmanIndex);
+        int pacmanYCood = game.getNodeYCood(pacmanIndex);
+        int currentNodeXCood = game.getNodeXCood(currentNode);
+        int currentNodeYCood = game.getNodeYCood(currentNode);
+    
+        // Calculate the Manhattan distance as the heuristic
+        int deltaX = Math.abs(currentNodeXCood - pacmanXCood);
+        int deltaY = Math.abs(currentNodeYCood - pacmanYCood);
+
+        // The priority is the sum of the cost so far (g) and the heuristic (h)
+        int gValue = nodes[0] == nodes[1] ? 0 : 1;  // g(n) - cost from start to current node
+        return gValue + deltaX + deltaY;
     }
 
     //This helper function checks if Ms Pac-Man is close to an available power pill
