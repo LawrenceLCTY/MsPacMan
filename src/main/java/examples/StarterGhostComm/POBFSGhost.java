@@ -7,7 +7,11 @@ import pacman.game.comms.BasicMessage;
 import pacman.game.comms.Message;
 import pacman.game.comms.Messenger;
 
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
+import java.util.Queue;
+import java.util.Set;
 
 
 /**
@@ -81,15 +85,16 @@ public class POBFSGhost extends IndividualGhostController {
                         System.out.println(pacmanIndex + " : " + currentIndex);
                     }
                 } else {
-                    if (rnd.nextFloat() < CONSISTENCY) {            //attack Ms Pac-Man otherwise (with certain probability)
-                        try {
-                            Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
-                                    pacmanIndex, game.getGhostLastMoveMade(ghost), Constants.DM.PATH);
-                            return move;
-                        } catch (ArrayIndexOutOfBoundsException e) {
-                            System.out.println(e);
-                            System.out.println(pacmanIndex + " : " + currentIndex);
-                        }
+                    try {
+                        // Constants.MOVE move = game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
+                        //         pacmanIndex, game.getGhostLastMoveMade(ghost), Constants.DM.PATH);
+                        Constants.MOVE move = breadthFirstSearch(game.getGhostCurrentNodeIndex(ghost),
+                                                                pacmanIndex, 
+                                                                game);
+                        return move;
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        System.out.println(e);
+                        System.out.println(pacmanIndex + " : " + currentIndex);
                     }
                 }
             } else {
@@ -98,6 +103,38 @@ public class POBFSGhost extends IndividualGhostController {
             }
         }
         return null;
+    }
+
+    public Constants.MOVE breadthFirstSearch(int ghostCurrentNodeIndex, int pacmanIndex, Game game){
+        Queue<int[]> queue = new LinkedList<>();
+        Set<Integer> explored = new HashSet<>();
+        int[] neighbouringNodes = game.getNeighbouringNodes(ghostCurrentNodeIndex);
+        for (int node : neighbouringNodes) {
+            queue.add(new int[] {node, node});
+        }
+        int pacmanXCood = game.getNodeXCood(pacmanIndex);
+        int pacmanYCood = game.getNodeYCood(pacmanIndex);
+
+        while (!queue.isEmpty()) {
+            int[] current = queue.remove();
+            int parentNode = current[0];
+            int currentNode = current[1];
+            if (!explored.contains(currentNode)) {
+                explored.add(currentNode);
+            }
+            if (pacmanXCood == game.getNodeXCood(currentNode) && pacmanYCood == game.getNodeYCood(currentNode)) {
+                return game.getMoveToMakeToReachDirectNeighbour(ghostCurrentNodeIndex, parentNode);
+            }
+            for (int nextNode: game.getNeighbouringNodes(currentNode)) {
+                if (nextNode != -1 && !explored.contains(nextNode)){
+                    queue.add(new int[] {parentNode, nextNode});
+                }   
+            }
+            
+        }
+
+        return null;
+
     }
 
     //This helper function checks if Ms Pac-Man is close to an available power pill
