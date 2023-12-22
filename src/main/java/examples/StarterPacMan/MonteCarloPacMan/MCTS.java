@@ -51,8 +51,9 @@ public class MCTS extends PacmanController {
 			double scoreTimeRatio = calculateScoreTimeRatio(game);
 			double timeLevelRatio = calculateTimeLevelRatio(game, game.getCurrentLevel(), game.getTotalTime());
 			double pillsEaten = calculateExplorationFitness(game);
+			double totalGameTime = calculateTotalTime(game);
 
-			fitnessData.recordFitness(level, pillsEaten, scoreTimeRatio);
+			fitnessData.recordFitness(level, totalGameTime, pillsEaten);
 			fitnessData.printData();
 
 			// Print current game state
@@ -320,6 +321,10 @@ public class MCTS extends PacmanController {
 		double fitnessScore = (double) totalElapsedTime / levelsPlayed;
 
 		return fitnessScore;
+	}
+
+	private double calculateTotalTime(Game game) {
+		return game.getTotalTime();
 	}
 
 	private double calculateExplorationFitness(Game game) {

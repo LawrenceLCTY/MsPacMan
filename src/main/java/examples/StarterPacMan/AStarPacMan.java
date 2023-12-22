@@ -49,10 +49,12 @@ public class AStarPacMan extends PacmanController {
 			double livesRemaining = livesRemaining();
 			double scoreTimeRatio = calculateScoreTimeRatio();
 			double timeLevelRatio = calculateTimeLevelRatio(game.getCurrentLevel(), game.getTotalTime());
+			double totalGameTime = calculateTotalTime();
 			double pillsEaten = calculateExplorationFitness();
+			fitnessData.recordFitness(level, totalGameTime, pillsEaten);
+			
 
 			// fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio, timeLevelRatio);
-			fitnessData.recordFitness(level, pillsEaten, timeLevelRatio);
 			fitnessData.printData();
 
 			// Print current game state
@@ -471,6 +473,14 @@ public class AStarPacMan extends PacmanController {
 		return fitnessScore;
 	}
 
+	private int calculateGhostsEaten(){
+		return game.getNumGhostsEaten();
+		
+	}
+
+	private double calculateTotalTime() {
+		return game.getTotalTime();
+	}
     private double calculateExplorationFitness() {
         int totalPills = game.getNumberOfPills();
         int totalPowerPills = game.getNumberOfPowerPills();
