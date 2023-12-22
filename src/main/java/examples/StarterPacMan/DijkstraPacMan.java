@@ -39,30 +39,33 @@ public class DijkstraPacMan extends PacmanController {
 	@Override
 	public MOVE getMove(Game game, long timeDue) {
 		this.game = game;
-    	pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
-    	pacmanLastMoveMade = game.getPacmanLastMoveMade();
-		
+		pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
+		pacmanLastMoveMade = game.getPacmanLastMoveMade();
+
 		// fitness
 		int level = game.getCurrentLevel();
 		if (prevLevel != level || game.gameOver()) {
 			double livesRemaining = livesRemaining();
 			double scoreTimeRatio = calculateScoreTimeRatio();
 			double timeLevelRatio = calculateTimeLevelRatio(game.getCurrentLevel(), game.getTotalTime());
+			double pillsEaten = calculateExplorationFitness();
 
-			fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio, timeLevelRatio);
+			// fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio,
+			// timeLevelRatio);
+			fitnessData.recordFitness(level, pillsEaten, timeLevelRatio);
 			fitnessData.printData();
 
 			// Print current game state
 			System.out.println(
-				"Level: " + level + 
-				", Score: " + game.getScore() + 
-				", Game Time: " + game.getTotalTime() +
-				", Actual Time: " + (System.currentTimeMillis() - actualTime) + "ms");
-				
-			//update actual game duration
+					"Level: " + level +
+							", Score: " + game.getScore() +
+							", Game Time: " + game.getTotalTime() +
+							", Actual Time: " + (System.currentTimeMillis() - actualTime) + "ms");
+
+			// update actual game duration
 			actualTime = System.currentTimeMillis();
 		}
-		prevLevel = level;	  
+		prevLevel = level;
 
 		// Random path length and minGhostDistance
 		int pathLength = pathLengthBase /* + getRandomInt(-50, 10) */;
@@ -364,13 +367,13 @@ public class DijkstraPacMan extends PacmanController {
 	}
 
 	private double calculateScoreTimeRatio() {
-        int totalScore = game.getScore();
-        int totalTime = game.getTotalTime();
-        
-        // Ensure totalTime is not zero to avoid division by zero
-        if (totalTime == 0) {
-            return 0.0;
-        }
+		int totalScore = game.getScore();
+		int totalTime = game.getTotalTime();
+
+		// Ensure totalTime is not zero to avoid division by zero
+		if (totalTime == 0) {
+			return 0.0;
+		}
 
 		return (double) totalScore / totalTime;
 	}
@@ -387,5 +390,21 @@ public class DijkstraPacMan extends PacmanController {
 		double fitnessScore = (double) totalElapsedTime / levelsPlayed;
 
 		return fitnessScore;
+	}
+
+	private double calculateExplorationFitness() {
+		int totalPills = game.getNumberOfPills();
+		int totalPowerPills = game.getNumberOfPowerPills();
+		int consumedPills = totalPills - game.getNumberOfActivePills();
+		int consumedPowerPills = totalPowerPills - game.getNumberOfActivePowerPills();
+
+		// Calculate the percentage of pills and power pills consumed
+		double pillsPercentage = (double) consumedPills / totalPills;
+		double powerPillsPercentage = (double) consumedPowerPills / totalPowerPills;
+
+		// Combine factors to form a fitness score
+		double explorationFitness = pillsPercentage * 0.8 + powerPillsPercentage * 0.2;
+
+		return explorationFitness;
 	}
 }
