@@ -48,11 +48,11 @@ public class DijkstraPacMan extends PacmanController {
 			double livesRemaining = livesRemaining();
 			double scoreTimeRatio = calculateScoreTimeRatio();
 			double timeLevelRatio = calculateTimeLevelRatio(game.getCurrentLevel(), game.getTotalTime());
+			double totalGameTime = calculateTotalTime();
 			double pillsEaten = calculateExplorationFitness();
 
-			// fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio,
-			// timeLevelRatio);
-			fitnessData.recordFitness(level, pillsEaten, timeLevelRatio);
+			fitnessData.recordFitness(level, pillsEaten, totalGameTime);
+			// fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio,timeLevelRatio);
 			fitnessData.printData();
 
 			// Print current game state
@@ -390,6 +390,9 @@ public class DijkstraPacMan extends PacmanController {
 		double fitnessScore = (double) totalElapsedTime / levelsPlayed;
 
 		return fitnessScore;
+	}
+	private double calculateTotalTime() {
+		return game.getTotalTime();
 	}
 
 	private double calculateExplorationFitness() {
