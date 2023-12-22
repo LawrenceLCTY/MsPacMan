@@ -50,19 +50,19 @@ public class MCTS extends PacmanController {
 			double livesRemaining = livesRemaining(game);
 			double scoreTimeRatio = calculateScoreTimeRatio(game);
 			double timeLevelRatio = calculateTimeLevelRatio(game, game.getCurrentLevel(), game.getTotalTime());
+			double pillsEaten = calculateExplorationFitness(game);
 
-			fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio, timeLevelRatio);
+			fitnessData.recordFitness(level, pillsEaten, scoreTimeRatio);
 			fitnessData.printData();
 
-			
 			// Print current game state
 			System.out.println(
-				"Level: " + level + 
-				", Score: " + game.getScore() + 
-				", Game Time: " + game.getTotalTime() +
-				", Actual Time: " + (System.currentTimeMillis() - actualTime) + "ms");
-				
-			//update actual game duration
+					"Level: " + level +
+							", Score: " + game.getScore() +
+							", Game Time: " + game.getTotalTime() +
+							", Actual Time: " + (System.currentTimeMillis() - actualTime) + "ms");
+
+			// update actual game duration
 			actualTime = System.currentTimeMillis();
 		}
 		if (junctions == null || prevLevel != level) {
@@ -320,6 +320,22 @@ public class MCTS extends PacmanController {
 		double fitnessScore = (double) totalElapsedTime / levelsPlayed;
 
 		return fitnessScore;
+	}
+
+	private double calculateExplorationFitness(Game game) {
+		int totalPills = game.getNumberOfPills();
+		int totalPowerPills = game.getNumberOfPowerPills();
+		int consumedPills = totalPills - game.getNumberOfActivePills();
+		int consumedPowerPills = totalPowerPills - game.getNumberOfActivePowerPills();
+
+		// Calculate the percentage of pills and power pills consumed
+		double pillsPercentage = (double) consumedPills / totalPills;
+		double powerPillsPercentage = (double) consumedPowerPills / totalPowerPills;
+
+		// Combine factors to form a fitness score
+		double explorationFitness = pillsPercentage * 0.8 + powerPillsPercentage * 0.2;
+
+		return explorationFitness;
 	}
 
 }

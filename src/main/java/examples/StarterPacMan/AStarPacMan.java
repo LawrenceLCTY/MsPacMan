@@ -49,8 +49,10 @@ public class AStarPacMan extends PacmanController {
 			double livesRemaining = livesRemaining();
 			double scoreTimeRatio = calculateScoreTimeRatio();
 			double timeLevelRatio = calculateTimeLevelRatio(game.getCurrentLevel(), game.getTotalTime());
+			double pillsEaten = calculateExplorationFitness();
 
-			fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio, timeLevelRatio);
+			// fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio, timeLevelRatio);
+			fitnessData.recordFitness(level, pillsEaten, timeLevelRatio);
 			fitnessData.printData();
 
 			// Print current game state
@@ -468,6 +470,22 @@ public class AStarPacMan extends PacmanController {
 
 		return fitnessScore;
 	}
+
+    private double calculateExplorationFitness() {
+        int totalPills = game.getNumberOfPills();
+        int totalPowerPills = game.getNumberOfPowerPills();
+        int consumedPills = totalPills - game.getNumberOfActivePills();
+        int consumedPowerPills = totalPowerPills - game.getNumberOfActivePowerPills();
+
+        // Calculate the percentage of pills and power pills consumed
+        double pillsPercentage = (double) consumedPills / totalPills;
+        double powerPillsPercentage = (double) consumedPowerPills / totalPowerPills;
+
+        // Combine factors to form a fitness score
+        double explorationFitness = pillsPercentage * 0.8 + powerPillsPercentage * 0.2;
+
+        return explorationFitness;
+    }
 }
 
 // #toremove: push not shown
