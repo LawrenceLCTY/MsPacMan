@@ -16,12 +16,12 @@ public class FitnessData {
 	}
 
 	public void printData() {
-		System.out.println("Level\tFitnessType1\tFitnessType2\tFitnessType3");
+		System.out.println("Level\tFitnessType1\tFitnessType2");
 		for (LevelFitness levelFitness : levelFitnessList) {
-			System.out.printf("%d\t%.2f\t\t%.2f\t\t%.2f\n",
+			System.out.printf("%d\t%.2f\t\t%.2f\n",
 					levelFitness.getLevel(),
 					levelFitness.getFitnessType1(),
-					levelFitness.getFitnessType2()
+					levelFitness.getFitnessType2());
 		}
 	}
 }

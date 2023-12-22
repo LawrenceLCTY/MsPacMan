@@ -40,10 +40,10 @@ public class Main {
         // MASController ghosts = new POCommGhosts(50);
         MASController ghosts = new CommGhosts(50, "astar");
 
-        executor.runGame(new TreeSearchPacMan(), ghosts, speed);
+        // executor.runGame(new TreeSearchPacMan(), ghosts, speed);
         // executor.runGame(new MCTS(), ghosts, speed);
         // executor.runGame(new TreeSearchPacMan(), ghosts, speed);
-        // executor.runGame( new AStarPacMan(), ghosts, speed); 
+        executor.runGame( new AStarPacMan(), ghosts, speed); 
 
 
     }
