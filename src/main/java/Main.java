@@ -1,9 +1,15 @@
 
 import java.util.EnumMap;
 
-import examples.StarterGhostComm.*;
-import examples.StarterPacMan.*; //for import Dijkstra and A*
-import examples.StarterPacMan.MonteCarloPacMan.MCTS;
+import examples.StarterGhostComm.Blinky;
+import examples.StarterGhostComm.CommGhosts;
+import examples.StarterGhostComm.Inky;
+import examples.StarterGhostComm.Pinky;
+import examples.StarterGhostComm.Sue;
+//for import Dijkstra and A*
+import examples.StarterPacMan.AStarPacMan;
+import examples.StarterPacMan.DijkstraPacMan;
+import examples.StarterPacMan.MonteCarloPacMan.*;
 import pacman.Executor;
 import pacman.controllers.IndividualGhostController;
 import pacman.controllers.MASController;
@@ -38,13 +44,12 @@ public class Main {
 
         // MASController ghosts = new POCommGhost(50);
         // MASController ghosts = new POCommGhosts(50);
-        MASController ghosts = new CommGhosts(50, "astar");
+        MASController ghosts = new CommGhosts(50, "bfs"); // bfs
 
         // executor.runGame(new TreeSearchPacMan(), ghosts, speed);
-        // executor.runGame(new MCTS(), ghosts, speed);
-        // executor.runGame(new TreeSearchPacMan(), ghosts, speed);
-        executor.runGame( new AStarPacMan(), ghosts, speed); 
-
+        executor.runGame(new MCTS(), ghosts, speed);
+        // executor.runGame(new DijkstraPacMan(), ghosts, speed);
+        // executor.runGame(new AStarPacMan(), ghosts, speed);
 
     }
 }

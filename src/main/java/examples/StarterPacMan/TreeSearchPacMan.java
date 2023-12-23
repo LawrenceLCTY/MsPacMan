@@ -56,7 +56,7 @@ public class TreeSearchPacMan extends PacmanController {
 			double pillsEaten = calculateExplorationFitness();
 
 			// fitnessData.recordFitness(level, livesRemaining, speed, timeLevelRatio);
-			fitnessData.recordFitness(level, pillsEaten, speed);
+			fitnessData.recordFitness(level, timeLevelRatio, checkPacManEaten(game));
 
 			System.out.println("hehe");
 			fitnessData.printData();
@@ -427,6 +427,15 @@ public class TreeSearchPacMan extends PacmanController {
 		double explorationFitness = pillsPercentage * 0.8 + powerPillsPercentage * 0.2;
 
 		return explorationFitness;
+	}
+
+	// New method to check if Pac-Man was eaten
+	private int checkPacManEaten(Game game) {
+		int num = 1;
+		if (!game.wasPacManEaten()) {
+			num = 0;
+		}
+		return num;
 	}
 
 }

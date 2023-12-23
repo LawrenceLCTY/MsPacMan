@@ -35,6 +35,7 @@ public class AStarPacMan extends PacmanController {
 	int prevLevel = 0;
 	FitnessData fitnessData = new FitnessData();
 	long actualTime = System.currentTimeMillis();
+	int pacmanEaten = 0;
 
 	@Override
 	public MOVE getMove(Game game, long timeDue) {
@@ -45,29 +46,30 @@ public class AStarPacMan extends PacmanController {
 		pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
 		pacmanLastMoveMade = game.getPacmanLastMoveMade();
 
+		if (game.wasPacManEaten()) {
+			pacmanEaten += 1;
+		}
+
 		if (prevLevel != level) {
 			double livesRemaining = livesRemaining();
 			double scoreTimeRatio = calculateScoreTimeRatio();
 			double timeLevelRatio = calculateTimeLevelRatio(game.getCurrentLevel(), game.getTotalTime());
 			double totalGameTime = calculateTotalTime();
-			double pillsEaten = calculateExplorationFitness();
+			fitnessData.recordFitness(level, totalGameTime, pacmanEaten);
 
-			fitnessData.recordFitness(level, pillsEaten, totalGameTime);
-
-			// fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio, timeLevelRatio);
+			// fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio,
+			// timeLevelRatio);
 			fitnessData.printData();
 
 			// Print current game state
 			System.out.println(
-				"Level: " + level + 
-				", Score: " + game.getScore() + 
-				", Game Time: " + game.getTotalTime() +
-				", Actual Time: " + (System.currentTimeMillis() - actualTime) + "ms");
-				
-			//update actual game duration
-			actualTime = System.currentTimeMillis();
-			
+					"Level: " + level +
+							", Score: " + game.getScore() +
+							", Game Time: " + game.getTotalTime() +
+							", Actual Time: " + (System.currentTimeMillis() - actualTime) + "ms");
 
+			// update actual game duration
+			actualTime = System.currentTimeMillis();
 		}
 		prevLevel = level;
 
@@ -476,21 +478,30 @@ public class AStarPacMan extends PacmanController {
 	private double calculateTotalTime() {
 		return game.getTotalTime();
 	}
-    private double calculateExplorationFitness() {
-        int totalPills = game.getNumberOfPills();
-        int totalPowerPills = game.getNumberOfPowerPills();
-        int consumedPills = totalPills - game.getNumberOfActivePills();
-        int consumedPowerPills = totalPowerPills - game.getNumberOfActivePowerPills();
 
-        // Calculate the percentage of pills and power pills consumed
-        double pillsPercentage = (double) consumedPills / totalPills;
-        double powerPillsPercentage = (double) consumedPowerPills / totalPowerPills;
+	private double calculateExplorationFitness() {
+		int totalPills = game.getNumberOfPills();
+		int totalPowerPills = game.getNumberOfPowerPills();
+		int consumedPills = totalPills - game.getNumberOfActivePills();
+		int consumedPowerPills = totalPowerPills - game.getNumberOfActivePowerPills();
 
-        // Combine factors to form a fitness score
-        double explorationFitness = pillsPercentage * 0.8 + powerPillsPercentage * 0.2;
+		System.out.println(" = = = = = = = =");
+		// System.out.printf("consumedPills : %d\n", consumedPills);
+		// System.out.printf("consumedPowerPills : %d\n", consumedPowerPills);
 
-        return explorationFitness;
-    }
+		// Calculate the percentage of pills and power pills consumed
+		double pillsPercentage = (double) consumedPills / totalPills;
+		double powerPillsPercentage = (double) consumedPowerPills / totalPowerPills;
+		// System.out.printf("pillsPercentage : %.2f\n", pillsPercentage);
+		// System.out.printf("powerPillsPercentage : %.2f\n", powerPillsPercentage);
+
+		// score * livesRemaining * 2
+
+		// Combine factors to form a fitness score
+		double explorationFitness = pillsPercentage * 0.8 + powerPillsPercentage * 0.2;
+
+		return explorationFitness;
+	}
 }
 
 // #toremove: push not shown

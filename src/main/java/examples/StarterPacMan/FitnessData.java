@@ -10,7 +10,7 @@ public class FitnessData {
 		this.levelFitnessList = new ArrayList<>();
 	}
 
-	public void recordFitness(int level, double fitnessType1, double fitnessType2) {
+	public void recordFitness(int level, double fitnessType1, int fitnessType2) {
 		LevelFitness levelFitness = new LevelFitness(level, fitnessType1, fitnessType2);
 		levelFitnessList.add(levelFitness);
 	}
@@ -18,7 +18,7 @@ public class FitnessData {
 	public void printData() {
 		System.out.println("Level\tFitnessType1\tFitnessType2");
 		for (LevelFitness levelFitness : levelFitnessList) {
-			System.out.printf("%d\t%.2f\t\t%.2f\n",
+			System.out.printf("%d\t%.2f\t\t\t%d\n",
 					levelFitness.getLevel(),
 					levelFitness.getFitnessType1(),
 					levelFitness.getFitnessType2());
@@ -29,9 +29,9 @@ public class FitnessData {
 class LevelFitness {
 	private int level;
 	private double fitnessType1;
-	private double fitnessType2;
+	private int fitnessType2;
 
-	public LevelFitness(int level, double fitnessType1, double fitnessType2) {
+	public LevelFitness(int level, double fitnessType1, int fitnessType2) {
 		this.level = level;
 		this.fitnessType1 = fitnessType1;
 		this.fitnessType2 = fitnessType2;
@@ -45,7 +45,7 @@ class LevelFitness {
 		return this.fitnessType1;
 	}
 
-	public double getFitnessType2() {
+	public int getFitnessType2() {
 		return this.fitnessType2;
 	}
 }
