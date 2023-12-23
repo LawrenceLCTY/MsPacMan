@@ -35,12 +35,17 @@ public class DijkstraPacMan extends PacmanController {
 	int prevLevel = 0;
 	FitnessData fitnessData = new FitnessData();
 	long actualTime = System.currentTimeMillis();
+	int pacmanEaten = 0;
 
 	@Override
 	public MOVE getMove(Game game, long timeDue) {
 		this.game = game;
 		pacmanCurrentNodeIndex = game.getPacmanCurrentNodeIndex();
 		pacmanLastMoveMade = game.getPacmanLastMoveMade();
+
+		if (game.wasPacManEaten()) {
+			pacmanEaten += 1;
+		}
 
 		// fitness
 		int level = game.getCurrentLevel();
@@ -51,8 +56,9 @@ public class DijkstraPacMan extends PacmanController {
 			double totalGameTime = calculateTotalTime();
 			double pillsEaten = calculateExplorationFitness();
 
-			fitnessData.recordFitness(level, pillsEaten, totalGameTime);
-			// fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio,timeLevelRatio);
+			// fitnessData.recordFitness(level, livesRemaining, scoreTimeRatio,
+			// timeLevelRatio);
+			fitnessData.recordFitness(level, totalGameTime, pacmanEaten);
 			fitnessData.printData();
 
 			// Print current game state
@@ -409,5 +415,18 @@ public class DijkstraPacMan extends PacmanController {
 		double explorationFitness = pillsPercentage * 0.8 + powerPillsPercentage * 0.2;
 
 		return explorationFitness;
+	}
+
+	// New method to check if Pac-Man was eaten
+	private int checkPacManEaten(Game game) {
+		int num = 1;
+		if (!game.wasPacManEaten()) {
+			num = 0;
+		}
+		return num;
+	}
+
+	private double calculateTotalTime(Game game) {
+		return game.getTotalTime();
 	}
 }

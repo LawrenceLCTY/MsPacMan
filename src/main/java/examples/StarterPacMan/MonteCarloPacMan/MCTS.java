@@ -41,11 +41,17 @@ public class MCTS extends PacmanController {
 	int prevLevel = 0;
 	FitnessData fitnessData = new FitnessData();
 	long actualTime = System.currentTimeMillis();
+	int pacmanEaten = 0;
 
 	@Override
 	public MOVE getMove(Game game, long timeDue) {
 		// fitness
 		int level = game.getCurrentLevel();
+
+		if (game.wasPacManEaten()) {
+			pacmanEaten += 1;
+		}
+
 		if (prevLevel != level) {
 			double livesRemaining = livesRemaining(game);
 			double scoreTimeRatio = calculateScoreTimeRatio(game);
@@ -53,7 +59,7 @@ public class MCTS extends PacmanController {
 			double pillsEaten = calculateExplorationFitness(game);
 			double totalGameTime = calculateTotalTime(game);
 
-			fitnessData.recordFitness(level, totalGameTime, pillsEaten);
+			fitnessData.recordFitness(level, totalGameTime, pacmanEaten);
 			fitnessData.printData();
 
 			// Print current game state
@@ -341,6 +347,15 @@ public class MCTS extends PacmanController {
 		double explorationFitness = pillsPercentage * 0.8 + powerPillsPercentage * 0.2;
 
 		return explorationFitness;
+	}
+
+	// New method to check if Pac-Man was eaten
+	private int checkPacManEaten(Game game) {
+		int num = 1;
+		if (!game.wasPacManEaten()) {
+			num = 0;
+		}
+		return num;
 	}
 
 }
